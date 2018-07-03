@@ -37,7 +37,7 @@ RUN apt-get update -y && \
     ln -fs ../../include/python2.7 local/include/python2.7 && \
     {% endif %}
     apt-get clean
-{% elif distro in ["alpine"] %}
+{% elif "alpine" in distro %}
 # openssh is necessary until this is fixed: https://github.com/ansible/ansible/issues/24705
 RUN apk add --no-cache -U python-dev make git curl rsync libffi libffi-dev openssl openssl-dev gcc musl-dev tar openssh
 {% endif %}
@@ -49,6 +49,7 @@ RUN (curl https://bootstrap.pypa.io/get-pip.py | python - --no-cache-dir ) && \
 
 # The COPY here will break cache if the version of Ansible Container changed
 COPY /container-src /_ansible/container
+RUN pip install --force-reinstall pip==9.0.3
 RUN cd /_ansible && \
     pip install --no-cache-dir -r container/conductor-build/conductor-requirements.txt && \
     PYTHONPATH=. LC_ALL="en_US.UTF-8" python container/conductor-build/setup.py develop -v -N && \
